@@ -6,14 +6,17 @@ arXiv link: https://arxiv.org/abs/2505.18051
 LookWhere accelerates inference and fine-tuning by approximating full, deep representations with adaptive computation of predictions learned from distillation. It learns both where to look, with an efficient selector of locations, and what to see, with an expressive extractor of representations.
 
 ## Downstream
-Setup
+Setup environment
 ```bash
-git clone
-CD to
-DL weights from HF
+git clone https://github.com/antofuller/lookwhere.git
+cd lookwhere
+wget https://huggingface.co/antofuller/lookwhere/resolve/main/lookwhere_dinov2.pt
+wget https://huggingface.co/antofuller/lookwhere/resolve/main/lookwhere_franca.pt
+pip install einops
+pip install timm
 ```
 
-
+Setup model for fine-tuning or inference
 ```python
 import torch
 from PIL import Image
@@ -25,7 +28,7 @@ high_res_img_size = 518  # size (height and width) of the high-res images
 assert high_res_img_size % 14 == 0  # must be divisible by 14, since the patch size is 14x14
 k_ratio = 0.1  # the fraction of high-res patches that are visible to the extractor
 assert 0.01 < k_ratio < 0.9  # be safe
-num_classes = 0  # number of classes, e.g., in ImageNet-1K num_classes=1_000
+num_classes = 0  # number of classes, if 0 then no classifier head is used
 is_classification = True  # if this is False, then it will be in patch-segmentation mode
 pretrained_params_path = "lookwhere_dinov2.pt"  # or "lookwhere_franca.pt", it _must_ be either!
 device = "cuda"
