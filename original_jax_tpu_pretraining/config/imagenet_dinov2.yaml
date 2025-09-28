@@ -1,0 +1,72 @@
+timm_model_name: "timm/vit_small_patch14_reg4_dinov2.lvd142m"
+
+train_batch_size: 1024
+valid_batch_size: 1024
+train_loader_workers: 20
+valid_loader_workers: 5
+
+random_crop: "rrc"
+color_jitter: 0.0
+auto_augment: "rand-m9-mstd0.5-inc1"
+random_erasing: 0.25
+augment_repeats: 1
+test_crop_ratio: 0.875
+
+criterion: "mse"
+zoom_map_criterion: "kl"
+
+layers: 12
+dim: 384
+heads: 6
+labels: 1000
+num_registers: 4
+
+patch_size: 14
+image_size: 518
+zoomer_image_size: 98
+zoomer_depth: 6
+
+init_seed: 0
+mixup_seed: 0
+dropout_seed: 0
+shuffle_seed: 0
+patch_select_seed: 0
+pretrained_ckpt: ""
+label_mapping: ""
+
+grad_accum: 1
+optimizer:
+  name: "adamw"
+  lr: 1e-4
+  weight_decay: 0.05
+  betas: [0.9, 0.999]
+  eps: 1e-8
+  lr_decay: 1.0
+  clip_grad: 0.0
+
+warmup_steps: 50_000
+training_steps: 500_000
+log_interval: 100
+eval_interval: 12_511
+
+dataset_name: "imagenet"
+top_k: None
+top_k_range:
+  min: 16
+  max: 128
+patch_selection_method: "topk-zoomer"
+distillation_losses:
+  cls: 1.0
+  reg: 0.0
+  patch: 1.0
+  map: 0.1
+conditioning_tokens: ["cls_token", "reg_token"]
+upsample_features:
+  type: NN
+  K: 5
+  distance_power: 1
+
+attn_aggregate: ["patch_token"]
+aggregate_layers: "last"
+
+project: "LW_dinov2"
