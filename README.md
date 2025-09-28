@@ -43,7 +43,7 @@ transform = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize(mean=torch.tensor([0.485, 0.456, 0.406]), std=torch.tensor([0.229, 0.224, 0.225])),
 ])
-image = Image.open("ice_cream.jpg")
+image = Image.open("ice_cream.jpg")  # shout-out to lucidrains and ice cream: https://github.com/lucidrains
 image = transform(image).unsqueeze(0).to(device)  # (bs, 3, high_res_img_size, high_res_img_size)
 
 # create model and load pre-trained weights
