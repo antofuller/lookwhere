@@ -64,6 +64,12 @@ with torch.no_grad():
     # x_patches = lw(image)  # (bs, num_classes, grid_size, grid_size) if num_classes is not 0 and is_cls is False
 ```
 
+If you only need the selector map
+```python
+with torch.no_grad():
+    selector_map = lw.selector(image)["selector_map"]  # (bs, num_high_res_patches)
+```
+
 ## Pre-training (JAX / TPU)
 We ran all pre-training experiments on Google's TPUs. This code can be found in the directory: `original_jax_tpu_pretraining`
 
