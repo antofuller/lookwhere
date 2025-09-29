@@ -6,7 +6,8 @@ arXiv link: https://arxiv.org/abs/2505.18051
 LookWhere accelerates inference and fine-tuning by approximating full, deep representations with adaptive computation of predictions learned from distillation. It learns both where to look, with an efficient selector of locations, and what to see, with an expressive extractor of representations.
 
 ## Downstream
-Setup environment
+### Setup environment
+Clone the repo, download weights, and install einops and timm if not already installed. If you are only using LookWhere-DINOv2 (which is better than our LookWhere-Franca), then you only need to download it.
 ```bash
 git clone https://github.com/antofuller/lookwhere.git
 cd lookwhere
@@ -16,7 +17,13 @@ pip install einops
 pip install timm
 ```
 
-Setup model for fine-tuning or inference
+### Setup model for fine-tuning or inference
+We've made it as simple as possible to fine-tune or directly use LookWhere. Here are the user settings:
+* high_res_img_size: The size (height and width) of the high-res images. LookWhere is pre-trained at 518x518, thus if you choose another value for this you should fine-tune it to adjust to the different resolution. We've fine-tuned up to 1036x1036, but think you can go higher without issue. Because our patch size is 14x14, this value needs to be evenly divisible by 14.
+* k_ratio: The fraction of high-res patches that are visible to the extractor. This should be between 0 and 1, lower values make LookWhere faster but likely reduce accuracy (depending on the task of course). You should try different values of k to choose an acceptable speed-accuracy operating point.
+* num_classes: The number of classes per image (if in classification mode) or per patch (if in segmentation mode). This just attaches a linear head on top of our pre-trained LookWhere. If this is 0, then no head will be used and LookWhere will return extracted features.
+* is_classification: The task type, True puts LookWhere in classification mode, False in segmentation mode. If num_classes is 0, then it returns the CLS token (in classification mode) or all (interpolated high-res) patch tokens (in segmentation mode). If num_classes is _not_ 0, then it returns the logits per image (in classification mode) or logits per patch (in segmentation mode).
+* pretrained_params_path: This needs to be either "lookwhere_dinov2.pt" or "lookwhere_franca.pt". A directory can precede the file name and it should work without issue.
 ```python
 import torch
 from PIL import Image
@@ -24,13 +31,13 @@ from torchvision import transforms
 from modeling import LookWhereDownstream
 
 # user settings
-high_res_img_size = 518  # size (height and width) of the high-res images
-assert high_res_img_size % 14 == 0  # must be divisible by 14, since the patch size is 14x14
-k_ratio = 0.1  # the fraction of high-res patches that are visible to the extractor
-assert 0.01 < k_ratio < 0.9  # be safe
-num_classes = 0  # number of classes, if 0 then no classifier head is used
-is_classification = True  # if this is False, then it will be in patch-segmentation mode
-pretrained_params_path = "lookwhere_dinov2.pt"  # or "lookwhere_franca.pt", it _must_ be either!
+high_res_img_size = 518
+assert high_res_img_size % 14 == 0
+k_ratio = 0.1
+assert 0.01 < k_ratio < 0.99
+num_classes = 0
+is_classification = True
+pretrained_params_path = "lookwhere_dinov2.pt"
 device = "cuda"
 
 # auto
